@@ -14,37 +14,52 @@ module.exports = function(grunt) {
   // creation: http://gruntjs.com/creating-tasks
 
   grunt.registerMultiTask('picasa', 'The best Grunt plugin ever.', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
-        }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+    var done = this.async();
 
-      // Handle options.
-      src += options.punctuation;
+    function buildHTML( album ) {
+      var html = '';
+      html += '---\n';
+      html += 'layout: post\n';
+      html += 'title: ' + album.caption + '\n';
+      html += '---\n';
+      html += '<photo-album>\n';
+      for ( var i in album.photos ) {
+        var photo = album.photos[ i ];
+        html += ' <photo-album-photo\n';
+        html += '  thumbnail="' + photo.thumbnail + '"\n';
+        html += '  src="' + photo.src + '"\n';
+        html += '  caption="' + photo.caption + '">\n';
+        html += ' </photo-album-photo>\n';
+      }
+      html += '</photo-album>\n';
+      return html;
+    }
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+    function readyCallback( success, results ) {
+      if ( !success ) {
+        grunt.log.error( results );
+        done();
+        return;
+      }
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
-    });
-  });
+      var albums = results.albums;
+      for ( var i in albums ) {
+        var album = albums[ i ];
+        var albumDate = new Date( album.earlyTimestamp );
+        var y = albumDate.getFullYear();
+        var m = albumDate.getMonth() + 1;  // +1 since getMonth returns 0 for January
+        var d = albumDate.getDate();
+        var filePath = this.data.src + '/_posts/' + y + '-' + m + '-' + d +  // jshint ignore:line
+                        '-' + album.caption.toLowerCase().replace(' ', '-') +
+                        '.html';
+        grunt.file.write( filePath, buildHTML( album ) );
+      }
+      done();
+    }
+    var photoLoader = require('./lib/picasa')( grunt, this.data.config );
 
+    photoLoader.on( 'ready', readyCallback.bind( this ) );
+
+  } );
 };
