@@ -51,7 +51,7 @@ module.exports = function(grunt) {
         var m = albumDate.getMonth() + 1;  // +1 since getMonth returns 0 for January
         var d = albumDate.getDate();
         var filePath = this.data.src + '/_posts/' + y + '-' + m + '-' + d +  // jshint ignore:line
-                        '-' + album.caption.toLowerCase().replace(' ', '-') +
+                        '-' + album.caption.toLowerCase().split(' ').join('-') +
                         '.html';
         grunt.file.write( filePath, buildHTML( album ) );
       }
