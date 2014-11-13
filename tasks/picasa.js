@@ -53,7 +53,9 @@ module.exports = function(grunt) {
         var filePath = this.data.src + '/_posts/' + y + '-' + m + '-' + d +  // jshint ignore:line
                         '-' + album.caption.toLowerCase().split(' ').join('-') +
                         '.html';
+        grunt.log.write('Writing ' + filePath + '...');
         grunt.file.write( filePath, buildHTML( album ) );
+        grunt.log.ok();
       }
       done();
     }

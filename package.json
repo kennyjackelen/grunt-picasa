@@ -1,7 +1,7 @@
 {
   "name": "grunt-picasa",
   "description": "Pulls photos from Google+ to build blog posts for Jekyll.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/kennyjackelen/grunt-picasa",
   "author": {
     "name": "Kenny Jackelen",
