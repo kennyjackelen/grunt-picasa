@@ -69,9 +69,13 @@ function loadPhotos( grunt, config, emitter ) {
         // I don't care about these albums, so I skip them.
         continue;
       }
+      if ( album.gphoto$name.$t.indexOf('Hangout') > -1 ) {
+        // Photos from Hangouts--not sure how else to detect these, since
+        // they don't have a type like the other special albums do.
+        continue;
+      }
       var closure = makeGetPhotoListClosure( album.gphoto$id.$t );
-      albumOps.push(closure
-      );
+      albumOps.push(closure);
     }
 
     async.series( albumOps, processedAllAlbums );
